@@ -1,5 +1,17 @@
 ﻿Imports System.IO
 
+'Three / Tree:
+'Some non-native English speakers have trouble both pronouncing And understanding the "TH" sound.
+'Tree Is better pronounced And better understood by all people, regardless Of accent.
+
+'Five / Fife
+'Much of aviation has a military history. On a poorly heard transmission "Five" can sound a lot Like "Fire",
+'which Is both a military command To "shoot", And an aviation emergency! "Fife" avoids that ambiguity.
+
+'Nine / Niner
+'German Is a commonly spoken language, And "Nein"(pronounced Like "Nine" In English) Is "No" In German.
+'To keep it clear that this Is a digit And Not a negative-reply, "Niner" Is distinct from the "Nine"
+
 Module CallsignTrainer
     Sub Main()
         Dim rnd = New Random(Now.Ticks Mod Integer.MaxValue)
@@ -9,76 +21,45 @@ Module CallsignTrainer
 
         Dim testMode As Boolean
         Dim engMode As Boolean
-        Dim extendedMode As Boolean
         Dim talkMode As Boolean
         While True
             ClearScr(True)
 
             Console.WriteLine()
             Console.WriteLine("Режим:")
-            Console.WriteLine("0 - обучение (RU)")
-            Console.WriteLine("1 - обучение (EN)")
-            Console.WriteLine("2 - обучение (RU), расширенное")
-            Console.WriteLine("3 - обучение (EN), расширенное")
-            Console.WriteLine("4 - самотестирование (RU)")
-            Console.WriteLine("5 - самотестирование (EN)")
-            Console.WriteLine("6 - самотестирование (RU), расширенное")
-            Console.WriteLine("7 - самотестирование (EN), расширенное")
-            Console.WriteLine("8 - озвучивание (RU)")
-            Console.WriteLine("9 - озвучивание (EN)")
+            Console.WriteLine("1 - обучение (RU)")
+            Console.WriteLine("2 - обучение (EN)")
+            Console.WriteLine("3 - самотестирование (RU)")
+            Console.WriteLine("4 - самотестирование (EN)")
+            Console.WriteLine("5 - озвучивание (RU)")
+            Console.WriteLine("6 - озвучивание (EN)")
 
             Dim modeStr = Console.ReadLine().Trim()
 
             Select Case modeStr
-                Case "0"
-                    testMode = False
-                    engMode = False
-                    extendedMode = False
-                    talkMode = False
                 Case "1"
                     testMode = False
-                    engMode = True
-                    extendedMode = False
+                    engMode = False
                     talkMode = False
                 Case "2"
                     testMode = False
-                    engMode = False
-                    extendedMode = True
+                    engMode = True
                     talkMode = False
                 Case "3"
-                    testMode = False
-                    engMode = True
-                    extendedMode = True
+                    testMode = True
+                    engMode = False
                     talkMode = False
                 Case "4"
                     testMode = True
-                    engMode = False
-                    extendedMode = False
+                    engMode = True
                     talkMode = False
                 Case "5"
-                    testMode = True
-                    engMode = True
-                    extendedMode = False
-                    talkMode = False
-                Case "6"
-                    testMode = True
-                    engMode = False
-                    extendedMode = True
-                    talkMode = False
-                Case "7"
-                    testMode = True
-                    engMode = True
-                    extendedMode = True
-                    talkMode = False
-                Case "8"
                     testMode = False
                     engMode = False
-                    extendedMode = False
                     talkMode = True
-                Case "9"
+                Case "6"
                     testMode = False
                     engMode = True
-                    extendedMode = False
                     talkMode = True
                 Case Else
                     Continue While
@@ -100,6 +81,7 @@ Module CallsignTrainer
 
         Dim voiceName As String = String.Empty
         If Not engMode Then
+            sp.Rate = 1
             voiceName = GetInstalledVoiceName(False)
             If String.IsNullOrEmpty(voiceName) Then
                 Console.WriteLine()
@@ -109,6 +91,7 @@ Module CallsignTrainer
             End If
             phoneticDic = GetPhoneticDicRU()
         Else
+            sp.Rate = 0
             voiceName = GetInstalledVoiceName(True)
             If String.IsNullOrEmpty(voiceName) Then
                 Console.WriteLine()
@@ -143,7 +126,7 @@ Module CallsignTrainer
                 Console.WriteLine()
             End If
 
-            Dim callsignStr = PhoneticConvert(phoneticDic, talkCallsign, extendedMode, rnd)
+            Dim callsignStr = PhoneticConvert(phoneticDic, talkCallsign, rnd)
             sp.Speak(callsignStr)
 
             Dim choice As ConsoleKeyInfo
@@ -177,7 +160,8 @@ Module CallsignTrainer
         End While
     End Sub
 
-    Private Function PhoneticConvert(dic As Dictionary(Of Char, String()), callsignStr As String, extendedMode As Boolean, rnd As Random) As String
+    Private Function PhoneticConvert(dic As Dictionary(Of Char, String()), callsignStr As String, rnd As Random,
+                                     Optional extendedMode As Boolean = False) As String
         Dim callsignStrWords = String.Join(" ", callsignStr.Select(Function(c)
                                                                        If dic.ContainsKey(c) Then
                                                                            Dim words = dic(c)
@@ -196,32 +180,32 @@ Module CallsignTrainer
     Private Function GetPhoneticDicRU() As Dictionary(Of Char, String())
         Dim dic = New Dictionary(Of Char, String())()
         With dic
-            .Add("A", {"анна", "антон"})
+            .Add("A", {"анна"})
             .Add("B", {"борис"})
-            .Add("C", {"центр", "цапля"})
-            .Add("D", {"дмитрий", "дима"})
+            .Add("C", {"цапля"})
+            .Add("D", {"дмитрий"})
             .Add("E", {"елена"})
             .Add("F", {"фёдор"})
-            .Add("G", {"галина", "григорий"})
+            .Add("G", {"григорий"})
             .Add("H", {"харитон"})
             .Add("I", {"иван"})
-            .Add("J", {"иван краткий", "йот"})
-            .Add("K", {"киловатт", "константин"})
+            .Add("J", {"иван краткий"})
+            .Add("K", {"константин"})
             .Add("L", {"леонид"})
-            .Add("M", {"михаил", "мария"})
+            .Add("M", {"михаил"})
             .Add("N", {"николай"})
             .Add("O", {"ольга"})
             .Add("P", {"павел"})
             .Add("Q", {"щука"})
-            .Add("R", {"роман", "радио"})
-            .Add("S", {"сергей", "семен"})
-            .Add("T", {"тамара", "татьяна"})
+            .Add("R", {"роман"})
+            .Add("S", {"семен"})
+            .Add("T", {"татьяна"})
             .Add("U", {"ульяна"})
-            .Add("V", {"жук", "женя"})
+            .Add("V", {"женя"})
             .Add("W", {"василий"})
-            .Add("X", {"знак", "икс"})
-            .Add("Y", {"игрэк", "еры"})
-            .Add("Z", {"зинаида", "зоя"})
+            .Add("X", {"мягкий знак"})
+            .Add("Y", {"ееры"})
+            .Add("Z", {"зинаида"})
             .Add("0", {"ноль"})
             .Add("1", {"один"})
             .Add("2", {"два"})
@@ -239,42 +223,42 @@ Module CallsignTrainer
     Private Function GetPhoneticDicEN() As Dictionary(Of Char, String())
         Dim dic = New Dictionary(Of Char, String())()
         With dic
-            .Add("A", {"alfa", "america", "able"})
-            .Add("B", {"bravo", "boston", "baker"})
-            .Add("C", {"charlie", "canada"})
-            .Add("D", {"delta", "denmark", "david"})
-            .Add("E", {"echo", "ecuador", "england"})
-            .Add("F", {"foxtrot", "florida", "frank"})
-            .Add("G", {"golf", "germany", "george"})
-            .Add("H", {"hotel", "henry"})
-            .Add("I", {"eeetaly", "india", "item"}) 'eeetaly => italy, speech fix
-            .Add("J", {"juliet", "japan"})
-            .Add("K", {"kilo", "kentucky", "king"})
-            .Add("L", {"lima", "london"})
-            .Add("M", {"mike", "mexico", "mary"})
-            .Add("N", {"november", "norway", "nancy"})
-            .Add("O", {"oscar", "ontario", "ocean"})
-            .Add("P", {"papa", "portugal", "peter"})
-            .Add("Q", {"quebec", "queen"})
-            .Add("R", {"romeo", "radio"})
-            .Add("S", {"sierra", "santiago", "sugar"})
-            .Add("T", {"tango", "tokyo", "texas"})
-            .Add("U", {"uniform", "united"})
-            .Add("V", {"victor", "victory", "victoria"})
-            .Add("W", {"whiskey", "william", "washington"})
+            .Add("A", {"alfa"})
+            .Add("B", {"bravo"})
+            .Add("C", {"charlie"})
+            .Add("D", {"delta"})
+            .Add("E", {"echo"})
+            .Add("F", {"foxtrot"})
+            .Add("G", {"golf"})
+            .Add("H", {"hotel"})
+            .Add("I", {"india"})
+            .Add("J", {"juliett"})
+            .Add("K", {"kilo"})
+            .Add("L", {"lima"})
+            .Add("M", {"mike"})
+            .Add("N", {"november"})
+            .Add("O", {"oscar"})
+            .Add("P", {"papa"})
+            .Add("Q", {"quebec"})
+            .Add("R", {"romeo"})
+            .Add("S", {"sierra"})
+            .Add("T", {"tango"})
+            .Add("U", {"uniform"})
+            .Add("V", {"victor"})
+            .Add("W", {"whiskey"})
             .Add("X", {"x-ray"})
-            .Add("Y", {"yankee", "yokohama", "yellow"})
-            .Add("Z", {"zulu", "zebra"})
+            .Add("Y", {"yankee"})
+            .Add("Z", {"zulu"})
             .Add("0", {"zero"})
             .Add("1", {"one"})
             .Add("2", {"two"})
-            .Add("3", {"three"})
-            .Add("4", {"four"})
-            .Add("5", {"five"})
+            .Add("3", {"tree"})
+            .Add("4", {"foaer"})
+            .Add("5", {"fife"})
             .Add("6", {"six"})
             .Add("7", {"seven"})
             .Add("8", {"eight"})
-            .Add("9", {"nine"})
+            .Add("9", {"niner"})
         End With
         Return dic
     End Function
@@ -288,7 +272,13 @@ Module CallsignTrainer
 
     Private Sub ClearScr(title As Boolean)
         Console.ResetColor()
+        Console.ForegroundColor = ConsoleColor.Gray
         Console.Clear()
-        If title Then Console.WriteLine("Тренажер фонетического алфавита, R1QAE, 2018")
+        If title Then
+            Console.WriteLine("Тренажер фонетического алфавита ICAO, 2025")
+            Console.WriteLine()
+            Console.WriteLine("Размер шрифта: Правой кн.мыши на заголовке окна -> Свойства -> Шрифт")
+            Console.WriteLine()
+        End If
     End Sub
 End Module
